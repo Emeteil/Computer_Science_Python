@@ -35,6 +35,7 @@ def main():
     print_matrix(matrix)
     
     # T_matrix = list(zip(*matrix)) # list[tuple]
+    # T_matrix = list(map(list, zip(*matrix))) # list[list]
     T_matrix = [list(i) for i in zip(*matrix)] # list[list]
     
     print("Транспонированная матрица:")
