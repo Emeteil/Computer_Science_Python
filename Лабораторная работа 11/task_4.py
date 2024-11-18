@@ -52,7 +52,7 @@ def main():
     layout = [[
         sg.Column(
             [
-                [sg.Image(source = "test.gif", size = (275, 275))],
+                [sg.Image(source = "task_4.png", size = (275, 275))],
                 [
                     sg.Text("Границы рандома"),
                     sg.InputText(default_text = "0", size = (5, 1), key = "MIN_GENERATE"),
