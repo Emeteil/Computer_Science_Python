@@ -23,7 +23,6 @@ while 1:
     count = value["count"]  #здесь хранится количество секунд для которых требуется рассчитать
     res = 0                 #здесь будет храниться результат
 
-
     x_0, N = map(int, (micro, count))
     k = 2
     b = 1
@@ -35,7 +34,6 @@ while 1:
     # for i in range(N):
     #     count_b = k * count_b + b
     # res = count_b
-
 
     if event == "Рассчитать":
         window["res"].update(res)
