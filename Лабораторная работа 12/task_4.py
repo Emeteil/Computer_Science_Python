@@ -1,3 +1,4 @@
+from PySG_gif_support import *
 import PySimpleGUI as sg
 
 BITS = 8 * 1
@@ -71,7 +72,7 @@ def main():
         [
             sg.Column(
                 [
-                    [sg.Image(source = "task_4.png", size = (275, 275))]
+                    [sg.Image(size = (275, 275), key = "IMAGE")]
                 ],
                 element_justification = 'center',
                 justification = 'center',
@@ -103,7 +104,9 @@ def main():
         ]
     ]
 
-    window = sg.Window("Представления чисел", layout, size = (500, 300), icon = "task_4.ico")
+    window = sg.Window("Представления чисел", layout, size = (500, 300), icon = "task_4.ico", finalize = True)
+    
+    _, stop_event = start_gif_animation(window, "IMAGE", "task_4.gif")
     
     while True:
         event, values = window.read()
@@ -123,6 +126,9 @@ def main():
             window["NUMBER"].update(text_color = "red")
         except Exception as e:
             print(e)
+
+    stop_gif_animation(stop_event)
+    window.close()
 
 if __name__ == "__main__":
     main()

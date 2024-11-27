@@ -95,6 +95,8 @@ def main():
             window["OUTPUT"].update("Некоректные данные!")
         except Exception as e:
             window["OUTPUT"].update(str(e))
+    
+    window.close()
 
 if __name__ == "__main__":
     main()
