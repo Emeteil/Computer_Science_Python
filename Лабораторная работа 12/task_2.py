@@ -25,11 +25,11 @@ def is_valid(N: int, chars: str) -> bool:
     if chars[0] != "Q":
         return False
     
-    chars: list = [chars[0]] + [
-        chars[i]
-        for i in range(1, len(chars))
-        if chars[i] != chars[i - 1]
-    ]
+    # chars: list = [chars[0]] + [
+    #     chars[i]
+    #     for i in range(1, len(chars))
+    #     if chars[i] != chars[i - 1]
+    # ]
     
     return chars.count("A") >= chars.count("Q")
 
