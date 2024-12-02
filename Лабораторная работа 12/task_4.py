@@ -109,7 +109,11 @@ def main():
     _, stop_event = start_gif_animation(window, "IMAGE", "task_4.gif")
     
     while True:
-        event, values = window.read()
+        event, values = window.read() # timeout = 0
+        
+        # Обрабатывается в текущем потоке, во время timeout блокирует ввод, обрезает гиф и не подстраивается по fps гифки
+        # window['IMAGE'].update_animation("task_4.gif", time_between_frames = 90)
+        
         try:
             match event:
                 case "NUMBER":
