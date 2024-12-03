@@ -59,12 +59,28 @@ def main() -> None:
     )
     thread.start()
     
+    mouse_button_down = False
+    previous_cell = None
+    
     running = True
     while running:
         for event in pygame.event.get():
             match event.type:
                 case pygame.MOUSEBUTTONDOWN:
-                    update_grid(grid, pygame.mouse.get_pos(), CELL_SIZE, MARGIN)
+                    if event.button == 1: # ЛКМ
+                        mouse_button_down = True
+                        current_cell = get_cell_coords(pygame.mouse.get_pos(), CELL_SIZE, MARGIN)
+                        update_grid(grid, pygame.mouse.get_pos(), CELL_SIZE, MARGIN)
+                        previous_cell = current_cell
+                case pygame.MOUSEBUTTONUP:
+                    if event.button == 1: # ЛКМ
+                        mouse_button_down = False
+                case pygame.MOUSEMOTION:
+                    if mouse_button_down:
+                        current_cell = get_cell_coords(pygame.mouse.get_pos(), CELL_SIZE, MARGIN)
+                        if current_cell != previous_cell:
+                            update_grid(grid, pygame.mouse.get_pos(), CELL_SIZE, MARGIN)
+                            previous_cell = current_cell
                 case pygame.QUIT:
                     stop_event.set()
                     running = False
