@@ -7,6 +7,10 @@ from utils.game_functions import (
     _one_step,
     _n_step
 )
+from utils.data_dialogs import (
+    _dialog_window_bool,
+    _dialog_window_size
+)
 
 stop_event = threading.Event()
 
@@ -23,20 +27,6 @@ def n_step_dialog(grid: list[list[bool]]) -> None:
         delay = 100
     )
     print(f"Пройдено {N} шагов!")
-
-@beartype
-def _dialog_window_bool(text: str) -> bool:
-    while True:
-        char = input(f"{text} (Y/N): ").lower()
-        if char in "yn": break
-    return char == 'y'
-
-@beartype
-def _dialog_window_size(text: str) -> int:
-    while True:
-        number = input(f"{text}: ")
-        if number.isdigit(): break
-    return int(number)
 
 @beartype
 def automated_game(grid: list[list[bool]]) -> None:
