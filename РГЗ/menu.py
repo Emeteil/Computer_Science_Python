@@ -1,6 +1,7 @@
 from beartype import beartype
 import threading
 import pygame
+import queue
 
 from utils.game_functions import (
     _one_step,
@@ -22,6 +23,20 @@ def n_step_dialog(grid: list[list[bool]]) -> None:
         delay = 100
     )
     print(f"Пройдено {N} шагов!")
+
+@beartype
+def _dialog_window_bool(text: str) -> bool:
+    while True:
+        char = input(f"{text} (Y/N): ").lower()
+        if char in "yn": break
+    return char == 'y'
+
+@beartype
+def _dialog_window_size(text: str) -> int:
+    while True:
+        number = input(f"{text}: ")
+        if number.isdigit(): break
+    return int(number)
 
 @beartype
 def automated_game(grid: list[list[bool]]) -> None:
@@ -57,22 +72,43 @@ def automated_game(grid: list[list[bool]]) -> None:
         )
     }
     
-    while not stop_event.is_set() and not stop_event.is_set():
+    while not stop.is_set() and not stop_event.is_set():
         try:
             _print_to_rows(local_actions)
             index = int(input("Действие > "))
-            if stop_event.is_set(): break
+            if stop.is_set() or stop_event.is_set(): break
             
             func = list(local_actions.values())[index - 1]
             func[0](*func[1])
             if len(func) > 2: func[2]()
         except (IndexError, ValueError):
             print("Введённые данные некоректны!")
-        
 
 @beartype
-def main_menu(grid: list[list[bool]]) -> None:
+def change_size(resize_data_queue: queue.Queue) -> None:
+    if not _dialog_window_bool("Сбросить поле и изменить размер?"):
+        return
+    
+    rows: int = _dialog_window_size("Количество строк(по умолчанию 10)")
+    if rows < 5: rows = 5
+    
+    cols: int = _dialog_window_size("Количество столбцов(по умолчанию 10)")
+    if cols < 5: cols = 5
+    
+    cell_size: int = _dialog_window_size("Размер ячейки(по умолчанию 40)")
+    if cell_size < 5: cell_size = 5
+    
+    margin: int = _dialog_window_size("Растояние между ячейками(по умолчанию 5)")
+    
+    resize_data_queue.put({'rows': rows, 'cols': cols, 'cell_size': cell_size, 'margin': margin})
+
+@beartype
+def main_menu(grid: list[list[bool]], resize_data_queue: queue.Queue) -> None:
     actions = {
+        "Запустить симуляцию": (
+            automated_game,
+            (grid,)            
+        ),
         "Один шаг": (
             _one_step,
             (grid,),
@@ -82,9 +118,9 @@ def main_menu(grid: list[list[bool]]) -> None:
             n_step_dialog,
             (grid,)
         ),
-        "Запустить": (
-            automated_game,
-            (grid,)            
+        "Изменить размер поля": (
+            change_size,
+            (resize_data_queue,)
         )
     }
     

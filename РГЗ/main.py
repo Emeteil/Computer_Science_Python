@@ -1,5 +1,7 @@
+from beartype import beartype
 import threading
 import pygame
+import queue
 import sys
 
 from utils.update_paint import *
@@ -17,16 +19,44 @@ MARGIN = 5
 ROWS = 10
 COLS = 10
 
-def main():
+@beartype
+def change_size_window(
+        grid: list[list[bool]],
+        rows: int,
+        cols: int,
+        cell_size: int,
+        margin: int
+    ) -> None:
+    global screen, ROWS, COLS, CELL_SIZE, MARGIN
+    ROWS, COLS, CELL_SIZE, MARGIN = rows, cols, cell_size, margin
+    grid.clear()
+    grid.extend([[False for _ in range(cols)] for _ in range(rows)])
+    window_size = [
+        (CELL_SIZE + MARGIN) * COLS + MARGIN,
+        (CELL_SIZE + MARGIN) * ROWS + MARGIN
+    ]
+    screen = pygame.display.set_mode(window_size)
+    print(1)
+
+def main() -> None:
     grid = [[False for _ in range(COLS)] for _ in range(ROWS)]
 
-    window_size = [(CELL_SIZE + MARGIN) * COLS + MARGIN,
-                   (CELL_SIZE + MARGIN) * ROWS + MARGIN]
+    window_size = [
+        (CELL_SIZE + MARGIN) * COLS + MARGIN,
+        (CELL_SIZE + MARGIN) * ROWS + MARGIN
+    ]
 
     screen = pygame.display.set_mode(window_size)
     pygame.display.set_caption("Life")
     
-    thread = threading.Thread(target = lambda: main_menu(grid))
+    resize_data_queue = queue.Queue()
+    
+    thread = threading.Thread(
+        target = lambda: main_menu(
+            grid = grid,
+            resize_data_queue = resize_data_queue
+        )
+    )
     thread.start()
     
     running = True
@@ -39,6 +69,9 @@ def main():
                     stop_event.set()
                     running = False
 
+        if not resize_data_queue.empty():
+            change_size_window(**resize_data_queue.get(), grid = grid)
+        
         screen.fill(MARGIN_COLOR)
         draw_grid(screen, grid, CELL_SIZE, MARGIN, LIFE_COLOR, DEAD_COLOR)
         pygame.display.flip()
