@@ -1,8 +1,9 @@
+import threading
 import pygame
 import sys
 
 from utils.update_paint import *
-from utils.game_functions import *
+from menu import main_menu, stop_event
 
 pygame.init()
 
@@ -24,7 +25,10 @@ def main():
 
     screen = pygame.display.set_mode(window_size)
     pygame.display.set_caption("Life")
-
+    
+    thread = threading.Thread(target = lambda: main_menu(grid))
+    thread.start()
+    
     running = True
     while running:
         for event in pygame.event.get():
@@ -32,6 +36,7 @@ def main():
                 case pygame.MOUSEBUTTONDOWN:
                     update_grid(grid, pygame.mouse.get_pos(), CELL_SIZE, MARGIN)
                 case pygame.QUIT:
+                    stop_event.set()
                     running = False
 
         screen.fill(MARGIN_COLOR)

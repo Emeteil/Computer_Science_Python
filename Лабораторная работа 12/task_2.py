@@ -11,11 +11,11 @@ QQAQ
 """.strip(),
 """
 3
-QAA
+QAQ
 """.strip(),
 """
 999
-QQQQQQQQQQQQQQQAQAQ
+QQQQQQQQQQQQQQQAQA
 """.strip()
 ]
 

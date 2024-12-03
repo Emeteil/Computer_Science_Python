@@ -1,7 +1,8 @@
 from beartype import beartype
+import pygame
 
 @beartype
-def alive_count(grid: list[list[bool]], row: int, col: int) -> int:
+def _alive_count(grid: list[list[bool]], row: int, col: int) -> int:
     indexs = [
         (-1, -1), # левая верхняя
         (-1, 0), # верхняя
@@ -21,17 +22,18 @@ def alive_count(grid: list[list[bool]], row: int, col: int) -> int:
     return count
 
 @beartype
-def one_step(grid: list[list[bool]]) -> None:
+def _one_step(grid: list[list[bool]]) -> None:
     rows, cols = len(grid), len(grid[0])
     for y in range(rows):
         for x in range(cols):
-            neighbors = alive_count(grid, y, x)
+            neighbors = _alive_count(grid, y, x)
             if grid[y][x]:
                 grid[y][x] = neighbors in (2, 3)
             else:
                 grid[y][x] = neighbors in (3,)
 
 @beartype
-def n_step(grid: list[list[bool]], n: int) -> None:
+def _n_step(grid: list[list[bool]], n: int, delay: int = 0) -> None:
     for _ in range(n):
-        one_step(grid)
+        _one_step(grid)
+        pygame.time.delay(delay)
