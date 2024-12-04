@@ -25,16 +25,36 @@ def _alive_count(grid: list[list[bool]], row: int, col: int) -> int:
     return count
 
 @beartype
-def _one_step(grid: list[list[bool]]) -> None:
-    rows, cols = len(grid), len(grid[0])
-    new_grid = deepcopy(grid)
-    for y in range(rows):
-        for x in range(cols):
+def __one_step_part(
+        grid: list[list[bool]],
+        new_grid: list[list[bool]],
+        start_row: int,
+        end_row: int
+    ) -> None:
+    for y in range(start_row, end_row):
+        for x in range(len(grid[0])):
             neighbors = _alive_count(new_grid, y, x)
             if new_grid[y][x]:
                 grid[y][x] = neighbors == 2 or neighbors == 3
             else:
                 grid[y][x] = neighbors == 3
+
+@beartype
+def _one_step(grid: list[list[bool]], num_threads: int = 4) -> None:
+    rows = len(grid)
+    new_grid = deepcopy(grid)
+    
+    rows_per_thread = rows // num_threads
+    futures = []
+    
+    with ThreadPoolExecutor(max_workers = num_threads) as executor:
+        for i in range(num_threads):
+            start_row = i * rows_per_thread
+            end_row = start_row + rows_per_thread if i < num_threads - 1 else rows
+            futures.append(executor.submit(__one_step_part, grid, new_grid, start_row, end_row))
+
+    for future in futures:
+        future.result()
 
 @beartype
 def _n_step(grid: list[list[bool]], n: int, delay: int = 0) -> None:

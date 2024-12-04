@@ -1,5 +1,6 @@
-from beartype import beartype
+from beartype import beartype, roar
 import threading
+import datetime
 import pygame
 import queue
 import json
@@ -9,6 +10,12 @@ from utils.game_functions import (
     _one_step,
     _n_step
 )
+
+# from utils.game_functions_multithreading import (
+#     _one_step,
+#     _n_step
+# )
+
 from utils.data_dialogs import (
     _dialog_window_bool,
     _dialog_window_size,
@@ -80,7 +87,7 @@ def automated_game(grid: list[list[bool]]) -> None:
             print("Введённые данные некоректны!")
 
 @beartype
-def clear_grid(grid: list[list[bool]]):
+def clear_grid(grid: list[list[bool]]) -> None:
     rows, cols = len(grid), len(grid[0])
     grid.clear()
     grid.extend([[False for _ in range(cols)] for _ in range(rows)])
@@ -88,10 +95,19 @@ def clear_grid(grid: list[list[bool]]):
 @beartype
 def save_grid(grid: list[list[bool]]):
     filepath = _dialog_window_filename_create(
-        text = "Название сохранения",
+        text = "Название сохранения(по умолчанию дата_время)",
         path = "saves",
-        type = "json"
+        type = "json",
+        ignore_none = True
     )
+    if stop_event.is_set(): return
+    
+    if not filepath:
+        now = datetime.datetime.now()
+        filepath = os.path.join(
+            "saves",
+            now.strftime("%Y-%m-%d_%H-%M-%S") + ".json"
+        )
     
     with open(filepath, "w", encoding = "utf-8") as f:
         json.dump(grid, f, indent = 4)
@@ -99,15 +115,42 @@ def save_grid(grid: list[list[bool]]):
     print(f"Файл {filepath} сохранён!")
 
 @beartype
-def load_grid(grid: list[list[bool]]):
+def load_grid(
+        resize_data_queue: queue.Queue,
+        cell_size: int,
+        margin: int
+    ) -> None:
     filepath = _dialog_window_filename_get(
         text = "Выберите файл",
         path = "saves",
-        type = "json"
+        type = "json",
+        count_files = 5
     )
+    if stop_event.is_set(): return
     
-    with open(filepath, "w", encoding = "utf-8") as f:
-        json.dump(grid, f, indent = 4)
+    if not filepath: return
+    
+    @beartype
+    def __check_grid_structure(grid: list[list[bool]]) -> None: pass
+    
+    try:
+        with open(filepath, "r", encoding = "utf-8") as f:
+            new_grid = json.load(f)
+    except json.JSONDecodeError:
+        print("Файл повреждён!")
+        return
+    
+    try:
+        __check_grid_structure(new_grid)
+    except roar.BeartypeCallException:
+        print("Некоректная структура файал")
+        return
+    
+    rows, cols = len(new_grid), len(new_grid[0])
+    
+    resize_data_queue.put(
+        {'rows': rows, 'cols': cols, 'cell_size': cell_size, 'margin': margin, 'new_grid': new_grid}
+    )
     
     print(f"Файл {filepath} сохранён!")
 
@@ -115,22 +158,32 @@ def load_grid(grid: list[list[bool]]):
 def change_size(resize_data_queue: queue.Queue) -> None:
     if not _dialog_window_bool("Сбросить поле и изменить размер?"):
         return
+    if stop_event.is_set(): return
     
-    rows: int = _dialog_window_size("Количество строк(по умолчанию 10)")
+    rows: int = _dialog_window_size("Количество ячеек в строке")
     if rows < 5: rows = 5
+    if stop_event.is_set(): return
     
-    cols: int = _dialog_window_size("Количество столбцов(по умолчанию 10)")
+    cols: int = _dialog_window_size("Количество ячеек в столбце")
     if cols < 5: cols = 5
+    if stop_event.is_set(): return
     
-    cell_size: int = _dialog_window_size("Размер ячейки(по умолчанию 40)")
+    cell_size: int = _dialog_window_size("Размер ячейки")
     if cell_size < 5: cell_size = 5
+    if stop_event.is_set(): return
     
-    margin: int = _dialog_window_size("Растояние между ячейками(по умолчанию 5)")
+    margin: int = _dialog_window_size("Растояние между ячейками")
+    if stop_event.is_set(): return
     
     resize_data_queue.put({'rows': rows, 'cols': cols, 'cell_size': cell_size, 'margin': margin})
 
 @beartype
-def main_menu(grid: list[list[bool]], resize_data_queue: queue.Queue) -> None:
+def main_menu(
+        grid: list[list[bool]],
+        resize_data_queue: queue.Queue,
+        cell_size: int,
+        margin: int
+    ) -> None:
     actions = {
         "Запустить симуляцию": (
             automated_game,
@@ -148,6 +201,14 @@ def main_menu(grid: list[list[bool]], resize_data_queue: queue.Queue) -> None:
         "Изменить размер поля": (
             change_size,
             (resize_data_queue,)
+        ),
+        "Сохранить поле": (
+            save_grid,
+            (grid,)
+        ),
+        "Загрузить поле": (
+            load_grid,
+            (resize_data_queue, cell_size, margin)
         ),
         "Отчистить": (
             clear_grid,

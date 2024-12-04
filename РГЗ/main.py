@@ -4,6 +4,7 @@ import pygame
 import queue
 import yaml
 import sys
+import os
 
 from utils.update_paint import *
 from menu import main_menu, stop_event
@@ -12,6 +13,9 @@ pygame.init()
 
 with open("settings.yml", "r", encoding = "utf-8") as f:
     settings = yaml.load(f, yaml.FullLoader)
+
+if not os.path.isdir("saves"):
+    os.mkdir("saves")
 
 LIFE_COLOR = tuple(settings["LIFE_COLOR"])
 DEAD_COLOR = tuple(settings["DEAD_COLOR"])
@@ -29,12 +33,17 @@ def change_size_window(
         rows: int,
         cols: int,
         cell_size: int,
-        margin: int
+        margin: int,
+        new_grid: list[list[bool]] = None
     ) -> None:
     global screen, ROWS, COLS, CELL_SIZE, MARGIN
     ROWS, COLS, CELL_SIZE, MARGIN = rows, cols, cell_size, margin
     grid.clear()
-    grid.extend([[False for _ in range(cols)] for _ in range(rows)])
+    if new_grid:
+        grid.extend(new_grid)
+    else:
+        grid.extend([[False for _ in range(cols)] for _ in range(rows)])
+    
     window_size = [
         (CELL_SIZE + MARGIN) * COLS + MARGIN,
         (CELL_SIZE + MARGIN) * ROWS + MARGIN
@@ -57,7 +66,9 @@ def main() -> None:
     thread = threading.Thread(
         target = lambda: main_menu(
             grid = grid,
-            resize_data_queue = resize_data_queue
+            resize_data_queue = resize_data_queue,
+            cell_size = CELL_SIZE,
+            margin = MARGIN
         )
     )
     thread.start()
