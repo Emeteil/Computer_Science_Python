@@ -2,6 +2,7 @@ from beartype import beartype
 import threading
 import pygame
 import queue
+import yaml
 import sys
 
 from utils.update_paint import *
@@ -9,15 +10,18 @@ from menu import main_menu, stop_event
 
 pygame.init()
 
-LIFE_COLOR = (255, 255, 255)
-DEAD_COLOR = (0, 0, 0)
-MARGIN_COLOR = (10, 10, 10)
+with open("settings.yml", "r", encoding = "utf-8") as f:
+    settings = yaml.load(f, yaml.FullLoader)
 
-CELL_SIZE = 40
-MARGIN = 5
+LIFE_COLOR = tuple(settings["LIFE_COLOR"])
+DEAD_COLOR = tuple(settings["DEAD_COLOR"])
+MARGIN_COLOR = tuple(settings["MARGIN_COLOR"])
 
-ROWS = 10
-COLS = 10
+CELL_SIZE = settings["CELL_SIZE"]
+MARGIN = settings["MARGIN"]
+
+ROWS = settings["ROWS"]
+COLS = settings["COLS"]
 
 @beartype
 def change_size_window(
@@ -36,7 +40,6 @@ def change_size_window(
         (CELL_SIZE + MARGIN) * ROWS + MARGIN
     ]
     screen = pygame.display.set_mode(window_size)
-    print(1)
 
 def main() -> None:
     grid = [[False for _ in range(COLS)] for _ in range(ROWS)]

@@ -2,6 +2,8 @@ from beartype import beartype
 import threading
 import pygame
 import queue
+import json
+import os
 
 from utils.game_functions import (
     _one_step,
@@ -9,7 +11,9 @@ from utils.game_functions import (
 )
 from utils.data_dialogs import (
     _dialog_window_bool,
-    _dialog_window_size
+    _dialog_window_size,
+    _dialog_window_filename_create,
+    _dialog_window_filename_get
 )
 
 stop_event = threading.Event()
@@ -19,12 +23,13 @@ def _print_to_rows(items: dict) -> None:
     print(*[f"{i + 1}) {r}" for i, r in enumerate(items)], sep="\n")
 
 @beartype
-def n_step_dialog(grid: list[list[bool]]) -> None:
+def n_step_dialog(grid: list[list[bool]], delay: int = 100) -> None:
     N = int(input("Количество шагов: "))
+    without_delay = _dialog_window_bool("Без задержки?")
     _n_step(
         grid = grid,
         n = N,
-        delay = 100
+        delay = delay if not without_delay else 0
     )
     print(f"Пройдено {N} шагов!")
 
@@ -75,6 +80,38 @@ def automated_game(grid: list[list[bool]]) -> None:
             print("Введённые данные некоректны!")
 
 @beartype
+def clear_grid(grid: list[list[bool]]):
+    rows, cols = len(grid), len(grid[0])
+    grid.clear()
+    grid.extend([[False for _ in range(cols)] for _ in range(rows)])
+
+@beartype
+def save_grid(grid: list[list[bool]]):
+    filepath = _dialog_window_filename_create(
+        text = "Название сохранения",
+        path = "saves",
+        type = "json"
+    )
+    
+    with open(filepath, "w", encoding = "utf-8") as f:
+        json.dump(grid, f, indent = 4)
+    
+    print(f"Файл {filepath} сохранён!")
+
+@beartype
+def load_grid(grid: list[list[bool]]):
+    filepath = _dialog_window_filename_get(
+        text = "Выберите файл",
+        path = "saves",
+        type = "json"
+    )
+    
+    with open(filepath, "w", encoding = "utf-8") as f:
+        json.dump(grid, f, indent = 4)
+    
+    print(f"Файл {filepath} сохранён!")
+
+@beartype
 def change_size(resize_data_queue: queue.Queue) -> None:
     if not _dialog_window_bool("Сбросить поле и изменить размер?"):
         return
@@ -111,6 +148,10 @@ def main_menu(grid: list[list[bool]], resize_data_queue: queue.Queue) -> None:
         "Изменить размер поля": (
             change_size,
             (resize_data_queue,)
+        ),
+        "Отчистить": (
+            clear_grid,
+            (grid,)
         )
     }
     

@@ -1,0 +1,18 @@
+LIFE_COLOR:
+  - 255
+  - 255
+  - 255
+DEAD_COLOR:
+  - 0
+  - 0
+  - 0
+MARGIN_COLOR:
+  - 10
+  - 10
+  - 10
+
+CELL_SIZE: 20
+MARGIN: 3
+
+ROWS: 20
+COLS: 20
