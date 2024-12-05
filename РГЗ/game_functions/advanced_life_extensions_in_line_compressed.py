@@ -1,5 +1,4 @@
 from beartype import beartype
-import numpy as np
 import pygame
 import time
 
