@@ -16,3 +16,6 @@ MARGIN: 3
 
 ROWS: 20
 COLS: 20
+
+name: "The Game of Life"
+version: "1.1"

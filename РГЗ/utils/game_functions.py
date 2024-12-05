@@ -1,4 +1,3 @@
-from concurrent.futures import ThreadPoolExecutor
 from beartype import beartype
 from copy import deepcopy
 import pygame
@@ -42,4 +41,5 @@ def _n_step(grid: list[list[bool]], n: int, delay: int = 0) -> None:
     for _ in range(n):
         _one_step(grid)
         pygame.time.delay(delay)
-    print(f"Время выполнения {time.time() - start_time}")
+    if not delay:
+        print(f"Время выполнения {time.time() - start_time}")

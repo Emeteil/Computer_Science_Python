@@ -16,6 +16,8 @@ from utils.game_functions import (
 #     _n_step
 # )
 
+# Optimized algorithms: https://github.com/lightln2/LifeOhLife
+
 from utils.data_dialogs import (
     _dialog_window_bool,
     _dialog_window_size,
@@ -213,6 +215,18 @@ def main_menu(
         "Отчистить": (
             clear_grid,
             (grid,)
+        ),
+        "Wiki(URL)": (
+            os.system,
+            ("start https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life",)
+        ),
+        "Прикольные конструкции(URL)": (
+            os.system,
+            ("start https://life.written.ru/game_of_life_review_by_gardner",)
+        ),
+        "GitHub(URL)": (
+            os.system,
+            ("start https://github.com/Emeteil/Computer_Science_Python/tree/main/%D0%A0%D0%93%D0%97",)
         )
     }
     

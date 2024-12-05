@@ -59,7 +59,10 @@ def main() -> None:
     ]
 
     screen = pygame.display.set_mode(window_size)
-    pygame.display.set_caption("Life")
+    pygame.display.set_caption(f"{settings['name']} v{settings['version']}")
+    
+    icon = pygame.image.load('icon.ico')
+    pygame.display.set_icon(icon)
     
     resize_data_queue = queue.Queue()
     
