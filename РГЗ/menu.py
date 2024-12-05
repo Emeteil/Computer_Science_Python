@@ -6,15 +6,30 @@ import queue
 import json
 import os
 
-from utils.game_functions import (
+# from game_functions.simple_life import (
+#     _one_step,
+#     _n_step
+# )
+
+# from game_functions.without_deepcopy  import (
+#     _one_step,
+#     _n_step
+# )
+
+# from game_functions.multithreading_life import (
+#     _one_step,
+#     _n_step
+# )
+
+from game_functions.advanced_life_extensions_in_line_compressed import (
     _one_step,
     _n_step
 )
 
-# from utils.game_functions_multithreading import (
-#     _one_step,
-#     _n_step
-# )
+# simple_life: 0.335 sec / 100 steps / heart.json
+# without_deepcopy: 0.174 sec / 100 steps / heart.json
+# multithreading_life: 1.087 sec / 4 threads / 100 steps / heart.json
+# advanced_life_extensions_in_line_compressed: 0.037 sec / 100 steps / heart.json
 
 # Optimized algorithms: https://github.com/lightln2/LifeOhLife
 
@@ -154,7 +169,7 @@ def load_grid(
         {'rows': rows, 'cols': cols, 'cell_size': cell_size, 'margin': margin, 'new_grid': new_grid}
     )
     
-    print(f"Файл {filepath} сохранён!")
+    print(f"Файл {filepath} загружен!")
 
 @beartype
 def change_size(resize_data_queue: queue.Queue) -> None:

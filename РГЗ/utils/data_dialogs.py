@@ -54,14 +54,14 @@ def _dialog_window_filename_get(
         
         print(text)
         print(f"{'-' * 8}Page {current_page}/{total_pages}{'-' * 8}")
-        print("0) Предыдущая страница")
+        print("0) << Предыдущая страница <<")
         
         page_files = files[start_index:end_index]
         
         for i, file in enumerate(page_files, start = 1):
             print(f"{i}) {file}")
         
-        print(f"{len(page_files) + 1}) Следующая страница")
+        print(f"{len(page_files) + 1}) >> Следующая страница >>")
         
         try:
             index = int(input("Действие > "))
