@@ -28,7 +28,10 @@ def _dialog_window_filename_create(
         for c in ";|*?'\"`[]()$<>{}^#\/%!":
             filename = filename.replace(c, "")
         filepath = os.path.join(path, filename[:244] + f".{type[:10]}")
-        if not os.path.isfile(filepath): break
+        if os.path.isfile(filepath) and\
+            _dialog_window_bool(f"Перезаписать файл {filepath}?"):
+                break
+        break
     return filepath
 
 @beartype

@@ -21,7 +21,7 @@ import os
 #     _n_step
 # )
 
-from game_functions.advanced_life_extensions_in_line_compressed import (
+from game_functions.direct_neighbor_count_algorithm import (
     _one_step,
     _n_step
 )
@@ -29,7 +29,7 @@ from game_functions.advanced_life_extensions_in_line_compressed import (
 # simple_life: 0.335 sec / 100 steps / heart.json
 # without_deepcopy: 0.174 sec / 100 steps / heart.json
 # multithreading_life: 1.087 sec / 4 threads / 100 steps / heart.json
-# advanced_life_extensions_in_line_compressed: 0.037 sec / 100 steps / heart.json
+# direct_neighbor_count_algorithm: 0.037 sec / 100 steps / heart.json
 
 # Optimized algorithms: https://github.com/lightln2/LifeOhLife
 
