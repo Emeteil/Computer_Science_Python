@@ -31,7 +31,7 @@ def _one_step(grid: list[list[bool]]) -> None:
         for x in range(cols):
             neighbors = _alive_count(new_grid, y, x)
             if new_grid[y][x]:
-                grid[y][x] = neighbors == 2 or neighbors == 3
+                grid[y][x] = neighbors in (2, 3)
             else:
                 grid[y][x] = neighbors == 3
 
